@@ -24,7 +24,7 @@ export default function Onboarding() {
     if (currentStep < 6) {
       setCurrentStep(currentStep + 1);
     } else {
-      navigate("/");
+      navigate("/dashboard");
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Trash2, Plus, Minus, CreditCard, Building2, Smartphone, FileText, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,31 +6,43 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-
-const cartItems = [
-  {
-    id: 1,
-    name: "Workspace Pro",
-    description: "Monthly subscription",
-    price: 149,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: "Priority Support",
-    description: "Add-on",
-    price: 99,
-    quantity: 1,
-  },
-];
+import { cartService, CartItem } from "@/lib/cart";
+import { Link } from "react-router-dom";
 
 export default function Checkout() {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [step, setStep] = useState<"cart" | "payment" | "contract" | "success">("cart");
   const [paymentMethod, setPaymentMethod] = useState("card");
+
+  useEffect(() => {
+    setCartItems(cartService.getCart());
+  }, []);
+
+  const refreshCart = () => setCartItems([...cartService.getCart()]);
+
+  const removeItem = (id: string) => {
+    cartService.removeItem(id);
+    refreshCart();
+  };
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const tax = subtotal * 0.18;
   const total = subtotal + tax;
+
+  if (cartItems.length === 0 && step !== "success") {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-center animate-fade-in">
+        <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mb-4">
+          <CreditCard className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <h1 className="text-2xl font-bold mb-2">Your Cart is Empty</h1>
+        <p className="text-muted-foreground mb-6">Looks like you haven't added any services yet.</p>
+        <Button asChild>
+          <Link to="/services">Note our Services</Link>
+        </Button>
+      </div>
+    )
+  }
 
   if (step === "success") {
     return (
@@ -41,25 +53,25 @@ export default function Checkout() {
           </div>
           <h1 className="text-2xl font-bold mb-2">Order Confirmed!</h1>
           <p className="text-muted-foreground mb-6">
-            Thank you for your purchase. Your order #ORD-2024-001 has been confirmed.
+            Thank you for your purchase. Your order #ORD-{Date.now().toString().slice(-6)} has been confirmed.
           </p>
           <div className="bg-secondary/50 rounded-lg p-6 text-left mb-6">
             <h3 className="font-medium mb-3">Order Summary</h3>
             {cartItems.map((item) => (
               <div key={item.id} className="flex justify-between text-sm py-2">
-                <span>{item.name}</span>
-                <span>${item.price}</span>
+                <span>{item.title}</span>
+                <span>{item.currency === "INR" ? "₹" : "$"}{item.price.toLocaleString()}</span>
               </div>
             ))}
             <Separator className="my-3" />
             <div className="flex justify-between font-medium">
               <span>Total Paid</span>
-              <span>${total.toFixed(2)}</span>
+              <span>{cartItems[0]?.currency === "INR" ? "₹" : "$"}{total.toLocaleString()}</span>
             </div>
           </div>
           <div className="flex gap-3 justify-center">
             <Button variant="outline">Download Receipt</Button>
-            <Button>View Order</Button>
+            <Button asChild><Link to="/orders">View Order</Link></Button>
           </div>
         </div>
       </div>
@@ -67,7 +79,7 @@ export default function Checkout() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in text-left">
       <div>
         <h1 className="text-2xl font-bold">Checkout</h1>
         <p className="text-muted-foreground mt-1">Complete your purchase</p>
@@ -83,8 +95,8 @@ export default function Checkout() {
                 step === s
                   ? "bg-primary text-primary-foreground"
                   : cartItems.length > 0 && i < ["cart", "payment", "contract"].indexOf(step)
-                  ? "bg-success text-success-foreground"
-                  : "bg-secondary text-muted-foreground"
+                    ? "bg-success text-success-foreground"
+                    : "bg-secondary text-muted-foreground"
               )}
             >
               {i + 1}
@@ -108,32 +120,20 @@ export default function Checkout() {
                     className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg"
                   >
                     <div>
-                      <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                      <h3 className="font-medium">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground">{item.period}</p>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon-sm">
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="w-8 text-center">{item.quantity}</span>
-                        <Button variant="outline" size="icon-sm">
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <span className="font-medium w-20 text-right">
-                        ${item.price * item.quantity}
+                      {/* Quantity logic simplified for now since we just add 1 */}
+                      <span className="font-medium w-30 text-right">
+                        {item.currency === "INR" ? "₹" : "$"}{item.price.toLocaleString()}
                       </span>
-                      <Button variant="ghost" size="icon-sm" className="text-destructive">
+                      <Button variant="ghost" size="icon-sm" className="text-destructive" onClick={() => removeItem(item.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                 ))}
-              </div>
-              <div className="flex gap-3 mt-6">
-                <Input placeholder="Discount code" className="max-w-[200px]" />
-                <Button variant="outline">Apply</Button>
               </div>
             </div>
           )}
@@ -151,6 +151,7 @@ export default function Checkout() {
                     "flex items-center gap-4 p-4 rounded-lg border cursor-pointer",
                     paymentMethod === "card" && "border-primary bg-primary/5"
                   )}
+                  onClick={() => setPaymentMethod("card")}
                 >
                   <RadioGroupItem value="card" id="card" />
                   <CreditCard className="h-5 w-5 text-muted-foreground" />
@@ -163,6 +164,7 @@ export default function Checkout() {
                     "flex items-center gap-4 p-4 rounded-lg border cursor-pointer",
                     paymentMethod === "upi" && "border-primary bg-primary/5"
                   )}
+                  onClick={() => setPaymentMethod("upi")}
                 >
                   <RadioGroupItem value="upi" id="upi" />
                   <Smartphone className="h-5 w-5 text-muted-foreground" />
@@ -175,6 +177,7 @@ export default function Checkout() {
                     "flex items-center gap-4 p-4 rounded-lg border cursor-pointer",
                     paymentMethod === "invoice" && "border-primary bg-primary/5"
                   )}
+                  onClick={() => setPaymentMethod("invoice")}
                 >
                   <RadioGroupItem value="invoice" id="invoice" />
                   <Building2 className="h-5 w-5 text-muted-foreground" />
@@ -244,38 +247,42 @@ export default function Checkout() {
             <div className="space-y-3">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{item.name}</span>
-                  <span>${item.price}</span>
+                  <span className="text-muted-foreground">{item.title}</span>
+                  <span>{item.currency === "INR" ? "₹" : "$"}{item.price.toLocaleString()}</span>
                 </div>
               ))}
               <Separator />
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>${subtotal}</span>
+                <span>{cartItems[0]?.currency === "INR" ? "₹" : "$"}{subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Tax (18%)</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>{cartItems[0]?.currency === "INR" ? "₹" : "$"}{tax.toLocaleString()}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-medium">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{cartItems[0]?.currency === "INR" ? "₹" : "$"}{total.toLocaleString()}</span>
               </div>
             </div>
             <Button
               className="w-full mt-6"
-              variant="accent"
+              variant="default"
               onClick={() => {
                 if (step === "cart") setStep("payment");
                 else if (step === "payment") setStep("contract");
-                else if (step === "contract") setStep("success");
+                else if (step === "contract") {
+                  cartService.clearCart();
+                  setStep("success");
+                }
               }}
             >
               {step === "cart" && "Proceed to Payment"}
               {step === "payment" && "Continue to Contract"}
               {step === "contract" && "Complete Purchase"}
             </Button>
+
             {step !== "cart" && (
               <Button
                 variant="ghost"

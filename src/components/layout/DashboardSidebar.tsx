@@ -28,9 +28,9 @@ interface DashboardSidebarProps {
 }
 
 const navigation = [
-  { name: "Overview", href: "/", icon: LayoutDashboard },
+  { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { name: "Services", href: "/services", icon: Package },
-  { name: "Cart & Checkout", href: "/checkout", icon: ShoppingCart },
+  { name: "Cart", href: "/checkout", icon: ShoppingCart },
   { name: "Orders", href: "/orders", icon: ClipboardList },
   { name: "Projects", href: "/projects", icon: FolderKanban },
   { name: "Files", href: "/files", icon: FileText },
