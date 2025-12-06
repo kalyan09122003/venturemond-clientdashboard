@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { AuthProvider } from "@/context/AuthContext";
+import { CurrencyProvider } from "@/context/CurrencyContext";
+
 
 import Landing from "./pages/Landing";
 import Catalog from "./pages/Catalog";
@@ -23,8 +25,10 @@ import ProjectDetail from "./pages/ProjectDetail";
 import Files from "./pages/Files";
 import Team from "./pages/Team";
 import Billing from "./pages/Billing";
+import InvoiceDetail from "./pages/InvoiceDetail";
 import Analytics from "./pages/Analytics";
 import Support from "./pages/Support";
+import TicketDetail from "./pages/TicketDetail";
 import Integrations from "./pages/Integrations";
 import Account from "./pages/Account";
 import Settings from "./pages/Settings";
@@ -49,56 +53,60 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/auth/login" element={<Login />} />
-            <Route path="/auth/signup" element={<Signup />} />
-            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <CurrencyProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/auth/login" element={<Login />} />
+              <Route path="/auth/signup" element={<Signup />} />
+              <Route path="/auth/forgot-password" element={<ForgotPassword />} />
 
-            {/* Public Catalog/Pricing */}
-            <Route path="/catalog" element={<Catalog />} />
-            <Route path="/pricing" element={<Catalog />} />
+              {/* Public Catalog/Pricing */}
+              <Route path="/catalog" element={<Catalog />} />
+              <Route path="/pricing" element={<Catalog />} />
 
-            {/* Company & Legal */}
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            {/* Reuse Support for public or creates separate? User asked for footer link "Support Center".
-                Existing Support page is in Dashboard. I'll create a public redirect or simple page if needed,
-                but for now let's map /support to Contact or a new PublicSupport if critical.
-                Wait, /support is already a dashboard route.
-                I will make /support-center public or just use Contact for now to avoid conflicts if /support is protected below.
-                Actually, let's check DashboardLayout. It likely protects /support.
-                I will add /status as a placeholder too. */}
-            <Route path="/status" element={<Contact />} /> {/* Placeholder */}
+              {/* Company & Legal */}
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              {/* Reuse Support for public or creates separate? User asked for footer link "Support Center".
+                  Existing Support page is in Dashboard. I'll create a public redirect or simple page if needed,
+                  but for now let's map /support to Contact or a new PublicSupport if critical.
+                  Wait, /support is already a dashboard route.
+                  I will make /support-center public or just use Contact for now to avoid conflicts if /support is protected below.
+                  Actually, let's check DashboardLayout. It likely protects /support.
+                  I will add /status as a placeholder too. */}
+              <Route path="/status" element={<Contact />} /> {/* Placeholder */}
 
-            <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/onboarding" element={<Onboarding />} />
 
-            {/* Dashboard Routes */}
-            <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/overview" element={<Navigate to="/dashboard" replace />} />
+              {/* Dashboard Routes */}
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/overview" element={<Navigate to="/dashboard" replace />} />
 
-              <Route path="/services" element={<Services />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/projects/:id" element={<ProjectDetail />} />
-              <Route path="/files" element={<Files />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/billing" element={<Billing />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/support" element={<Support />} />
-              <Route path="/integrations" element={<Integrations />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/settings" element={<Settings />} />
-            </Route>
+                <Route path="/services" element={<Services />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/projects/:id" element={<ProjectDetail />} />
+                <Route path="/files" element={<Files />} />
+                <Route path="/team" element={<Team />} />
+                <Route path="/billing" element={<Billing />} />
+                <Route path="/billing/invoices/:id" element={<InvoiceDetail />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/support" element={<Support />} />
+                <Route path="/support/:id" element={<TicketDetail />} />
+                <Route path="/integrations" element={<Integrations />} />
+                <Route path="/account" element={<Account />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route>
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </CurrencyProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

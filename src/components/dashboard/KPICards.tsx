@@ -112,7 +112,7 @@ const kpis = [
     icon: DollarSign,
     variant: "success" as const,
     isCurrency: true,
-    currency: "USD",
+    currency: "INR",
     data: mrrData,
     chartType: "area",
     chartColor: "#10b981", // Emerald

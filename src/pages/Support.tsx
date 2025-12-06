@@ -1,43 +1,36 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   Search,
   Clock,
   MessageSquare,
-  ChevronRight,
-  Paperclip,
-  Send,
-  HelpCircle,
   Book,
   AlertCircle,
+  HelpCircle,
+  ChevronRight,
+  CheckCircle2,
+  MoreHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { CreateTicketDialog } from "@/components/support/CreateTicketDialog";
 
+// Mock Data
 const tickets = [
   {
     id: "TKT-001",
@@ -106,24 +99,25 @@ const faqs = [
 ];
 
 const statusConfig = {
-  open: { label: "Open", color: "bg-destructive/10 text-destructive" },
-  "in-progress": { label: "In Progress", color: "bg-info/10 text-info" },
-  pending: { label: "Pending", color: "bg-warning/10 text-warning" },
-  resolved: { label: "Resolved", color: "bg-success/10 text-success" },
+  open: { label: "Open", color: "bg-destructive/10 text-destructive", icon: AlertCircle },
+  "in-progress": { label: "In Progress", color: "bg-info/10 text-info", icon: Clock },
+  pending: { label: "Pending", color: "bg-warning/10 text-warning", icon: Clock },
+  resolved: { label: "Resolved", color: "bg-success/10 text-success", icon: CheckCircle2 },
 };
 
 const priorityConfig = {
-  high: { label: "High", color: "bg-destructive/10 text-destructive" },
-  medium: { label: "Medium", color: "bg-warning/10 text-warning" },
-  low: { label: "Low", color: "bg-muted text-muted-foreground" },
+  high: { label: "High", color: "text-destructive bg-destructive/10" },
+  medium: { label: "Medium", color: "text-warning bg-warning/10" },
+  low: { label: "Low", color: "text-muted-foreground bg-secondary" },
 };
 
 export default function Support() {
   const [createOpen, setCreateOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-8 animate-fade-in pb-10">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Support</h1>
@@ -131,125 +125,176 @@ export default function Support() {
             Get help and manage support tickets
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="h-4 w-4" />
+        <Button onClick={() => setCreateOpen(true)} className="shadow-lg shadow-primary/20">
+          <Plus className="h-4 w-4 mr-2" />
           Create Ticket
         </Button>
       </div>
 
       {/* Quick Actions */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="dashboard-card cursor-pointer hover:border-accent transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-accent/10 text-accent">
-              <MessageSquare className="h-5 w-5" />
+        <div className="dashboard-card group cursor-pointer hover:border-accent/40 transition-all hover:shadow-md">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-accent/10 text-accent group-hover:scale-110 transition-transform">
+              <MessageSquare className="h-6 w-6" />
             </div>
             <div>
-              <p className="font-medium">Live Chat</p>
+              <p className="font-semibold text-lg">Live Chat</p>
               <p className="text-sm text-muted-foreground">Chat with our team</p>
             </div>
           </div>
         </div>
-        <div className="dashboard-card cursor-pointer hover:border-accent transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-info/10 text-info">
-              <Book className="h-5 w-5" />
+        <div className="dashboard-card group cursor-pointer hover:border-info/40 transition-all hover:shadow-md">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-info/10 text-info group-hover:scale-110 transition-transform">
+              <Book className="h-6 w-6" />
             </div>
             <div>
-              <p className="font-medium">Documentation</p>
-              <p className="text-sm text-muted-foreground">Browse our guides</p>
+              <p className="font-semibold text-lg">Documentation</p>
+              <p className="text-sm text-muted-foreground">Browse knowledge base</p>
             </div>
           </div>
         </div>
-        <div className="dashboard-card cursor-pointer hover:border-accent transition-colors">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-warning/10 text-warning">
-              <AlertCircle className="h-5 w-5" />
+        <div className="dashboard-card group cursor-pointer hover:border-success/40 transition-all hover:shadow-md">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-success/10 text-success group-hover:scale-110 transition-transform">
+              <CheckCircle2 className="h-6 w-6" />
             </div>
             <div>
-              <p className="font-medium">System Status</p>
-              <p className="text-sm text-success">All systems operational</p>
+              <p className="font-semibold text-lg">System Status</p>
+              <p className="text-sm text-success font-medium">All systems operational</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Search & Tickets */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search tickets..." className="pl-9" />
-      </div>
+      {/* Ticket Management Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="section-title">Ticket History</h2>
+          {/* Search Bar */}
+          <div className="relative w-full max-w-xs md:max-w-sm hidden sm:block">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search tickets..." className="pl-9 bg-background/50" />
+          </div>
+        </div>
 
-      <div className="dashboard-card">
-        <h2 className="section-title mb-4">Your Tickets</h2>
-        <div className="space-y-3">
-          {tickets.map((ticket) => (
-            <div
-              key={ticket.id}
-              className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer"
-              onClick={() => setSelectedTicket(ticket.id)}
-            >
-              <div className="flex items-start gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{ticket.subject}</span>
-                    <Badge
-                      className={cn(
-                        "font-normal text-xs",
-                        priorityConfig[ticket.priority as keyof typeof priorityConfig].color
-                      )}
-                    >
-                      {priorityConfig[ticket.priority as keyof typeof priorityConfig].label}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                    <span>{ticket.id}</span>
-                    <span>•</span>
-                    <span>{ticket.category}</span>
-                    <span>•</span>
-                    <span>{ticket.created}</span>
+        <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
+          {/* Mobile Search - Visible only on mobile */}
+          <div className="p-4 sm:hidden border-b">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search tickets..." className="pl-9 bg-secondary/20" />
+            </div>
+          </div>
+
+          {/* Ticket List Header (Desktop) */}
+          <div className="hidden sm:grid grid-cols-12 gap-4 p-4 border-b bg-muted/30 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <div className="col-span-6 md:col-span-5">Ticket</div>
+            <div className="col-span-3 md:col-span-2">Priority</div>
+            <div className="col-span-3 md:col-span-2">Status</div>
+            <div className="hidden md:block col-span-2">SLA / Created</div>
+            <div className="hidden md:flex col-span-1 justify-end">Actions</div>
+          </div>
+
+          {/* Tickets */}
+          <div className="divide-y">
+            {tickets.map((ticket) => (
+              <div
+                key={ticket.id}
+                className="group flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-4 p-4 hover:bg-muted/30 transition-colors cursor-pointer"
+                onClick={() => navigate(`/support/${ticket.id}`)}
+              >
+                {/* Subject & ID */}
+                <div className="sm:col-span-6 md:col-span-5">
+                  <div className="flex items-start gap-3">
+                    <div className={cn("mt-1 p-1.5 rounded-full flex-shrink-0", statusConfig[ticket.status as keyof typeof statusConfig].color.replace('text-', 'bg-opacity-10 '))} >
+                      {(() => {
+                        const Icon = statusConfig[ticket.status as keyof typeof statusConfig].icon;
+                        return <Icon className="h-4 w-4" />;
+                      })()}
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
+                        {ticket.subject}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                        <span className="font-mono">{ticket.id}</span>
+                        <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+                        <span>{ticket.category}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4">
-                {ticket.slaRemaining && (
-                  <div className="flex items-center gap-1 text-sm">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className={cn(
-                      ticket.slaRemaining.includes("h") && !ticket.slaRemaining.includes("24h")
-                        ? "text-warning"
-                        : "text-muted-foreground"
-                    )}>
-                      {ticket.slaRemaining}
-                    </span>
-                  </div>
-                )}
-                <Badge
-                  className={cn(
-                    "font-normal",
-                    statusConfig[ticket.status as keyof typeof statusConfig].color
+
+                {/* Priority (Desktop) / Badges Row (Mobile) */}
+                <div className="sm:col-span-3 md:col-span-2 flex items-center mt-1 sm:mt-0 pl-[3.25rem] sm:pl-0">
+                  <Badge variant="secondary" className={cn("font-normal text-xs capitalize", priorityConfig[ticket.priority as keyof typeof priorityConfig].color)}>
+                    {priorityConfig[ticket.priority as keyof typeof priorityConfig].label} Priority
+                  </Badge>
+                </div>
+
+                {/* Status (Desktop) */}
+                <div className="hidden sm:flex sm:col-span-3 md:col-span-2 items-center">
+                  <Badge className={cn("font-medium capitalize", statusConfig[ticket.status as keyof typeof statusConfig].color)}>
+                    {statusConfig[ticket.status as keyof typeof statusConfig].label}
+                  </Badge>
+                </div>
+
+                {/* Metadata / SLA */}
+                <div className="hidden md:flex col-span-2 flex-col justify-center text-sm">
+                  {ticket.slaRemaining ? (
+                    <div className="flex items-center gap-1.5 text-warning font-medium text-xs mb-1">
+                      <Clock className="h-3 w-3" />
+                      {ticket.slaRemaining} left
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 text-muted-foreground text-xs mb-1 opacity-50">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Completed
+                    </div>
                   )}
-                >
-                  {statusConfig[ticket.status as keyof typeof statusConfig].label}
-                </Badge>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">{ticket.created}</span>
+                </div>
+
+                {/* Mobile Footer Info */}
+                <div className="flex sm:hidden items-center justify-between text-xs text-muted-foreground mt-2 pl-[3.25rem] border-t pt-3">
+                  <div className="flex items-center gap-2">
+                    <Badge className={cn("font-medium capitalize", statusConfig[ticket.status as keyof typeof statusConfig].color)}>
+                      {statusConfig[ticket.status as keyof typeof statusConfig].label}
+                    </Badge>
+                    <span>• {ticket.created}</span>
+                  </div>
+                  {ticket.slaRemaining && (
+                    <span className="text-warning font-medium">{ticket.slaRemaining} SLA</span>
+                  )}
+                </div>
+
+                {/* Action Arrow (Desktop) */}
+                <div className="hidden md:flex col-span-1 items-center justify-end text-muted-foreground">
+                  <ChevronRight className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
       {/* FAQ */}
       <div className="dashboard-card">
-        <div className="flex items-center gap-2 mb-4">
-          <HelpCircle className="h-5 w-5 text-accent" />
-          <h2 className="section-title">Frequently Asked Questions</h2>
+        <div className="flex items-center gap-2 mb-6">
+          <div className="p-2 rounded-lg bg-primary/10 text-primary">
+            <HelpCircle className="h-5 w-5" />
+          </div>
+          <h2 className="section-title mb-0">Frequently Asked Questions</h2>
         </div>
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
-            <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
+            <AccordionItem key={index} value={`item-${index}`} className="border-b-muted/50 last:border-0">
+              <AccordionTrigger className="text-left font-medium hover:text-primary transition-colors py-4">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>
@@ -258,112 +303,7 @@ export default function Support() {
       </div>
 
       {/* Create Ticket Modal */}
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Create Support Ticket</DialogTitle>
-            <DialogDescription>
-              Describe your issue and we'll get back to you soon
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Subject</Label>
-              <Input placeholder="Brief description of your issue" className="mt-1" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Category</Label>
-                <Select defaultValue="technical">
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="technical">Technical</SelectItem>
-                    <SelectItem value="billing">Billing</SelectItem>
-                    <SelectItem value="feature">Feature Request</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Priority</Label>
-                <Select defaultValue="medium">
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label>Description</Label>
-              <Textarea
-                placeholder="Please provide as much detail as possible..."
-                className="mt-1 min-h-[120px]"
-              />
-            </div>
-            <div>
-              <Label>Attachments</Label>
-              <div className="mt-1 border-2 border-dashed rounded-lg p-4 text-center">
-                <Paperclip className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  Drag & drop or click to upload
-                </p>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setCreateOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => setCreateOpen(false)}>
-                <Send className="h-4 w-4" />
-                Submit Ticket
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Ticket Detail Modal */}
-      <Dialog open={!!selectedTicket} onOpenChange={() => setSelectedTicket(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Ticket {selectedTicket}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="p-4 bg-secondary/30 rounded-lg">
-              <h3 className="font-medium">Cannot access project files</h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                I'm trying to access the files in Project Alpha but getting a permission error.
-                This started happening after the recent update.
-              </p>
-              <p className="text-xs text-muted-foreground mt-3">
-                Submitted 2 hours ago
-              </p>
-            </div>
-            <div className="border-l-2 border-accent pl-4 py-2">
-              <p className="text-sm font-medium">Support Agent</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Hi, thanks for reporting this. We're looking into it and will update you shortly.
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">1 hour ago</p>
-            </div>
-            <div>
-              <Label>Add Reply</Label>
-              <Textarea placeholder="Type your message..." className="mt-1" />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline">Close Ticket</Button>
-              <Button>Send Reply</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CreateTicketDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
 }
