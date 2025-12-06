@@ -53,7 +53,7 @@ export default function Services() {
     <div className="space-y-8 animate-fade-in text-left">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold">Pricing</h1>
+          <h1 className="text-2xl font-bold">Services & Pricing </h1>
           <p className="text-muted-foreground mt-1">
             Choose from our range of services and plans
           </p>

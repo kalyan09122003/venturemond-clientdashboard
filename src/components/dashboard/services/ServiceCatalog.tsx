@@ -12,7 +12,7 @@ export default function ServiceCatalog() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <h1 className="text-3xl font-bold tracking-tight">Service Catalog</h1>
+                <h1 className="text-3xl font-bold tracking-tight">Services & Pricing</h1>
 
                 <div className="flex items-center gap-2 bg-secondary/50 p-1 rounded-lg self-start">
                     <Button

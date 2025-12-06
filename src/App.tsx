@@ -100,7 +100,6 @@ const App = () => (
                 <Route path="/support/:id" element={<TicketDetail />} />
                 <Route path="/integrations" element={<Integrations />} />
                 <Route path="/account" element={<Account />} />
-                <Route path="/settings" element={<Navigate to="/account" replace />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />
