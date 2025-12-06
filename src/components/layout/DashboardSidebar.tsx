@@ -11,7 +11,6 @@ import {
   BarChart3,
   LifeBuoy,
   Settings,
-  Building2,
   ChevronLeft,
   X,
   Layers,
@@ -39,9 +38,9 @@ const navigation = [
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Support", href: "/support", icon: LifeBuoy },
   { name: "Integrations", href: "/integrations", icon: Layers },
-  { name: "Account", href: "/account", icon: Building2 },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Account Settings", href: "/account", icon: Settings },
 ];
+
 
 export function DashboardSidebar({
   collapsed,

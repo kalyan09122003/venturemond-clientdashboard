@@ -31,7 +31,6 @@ import Support from "./pages/Support";
 import TicketDetail from "./pages/TicketDetail";
 import Integrations from "./pages/Integrations";
 import Account from "./pages/Account";
-import Settings from "./pages/Settings";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
@@ -101,7 +100,7 @@ const App = () => (
                 <Route path="/support/:id" element={<TicketDetail />} />
                 <Route path="/integrations" element={<Integrations />} />
                 <Route path="/account" element={<Account />} />
-                <Route path="/settings" element={<Settings />} />
+                <Route path="/settings" element={<Navigate to="/account" replace />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

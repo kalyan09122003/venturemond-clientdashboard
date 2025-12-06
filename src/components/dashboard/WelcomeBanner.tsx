@@ -15,11 +15,11 @@ export function WelcomeBanner() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold mb-2">
-              Welcome back, John! 👋
+              Welcome back, John!
             </h1>
             <p className="text-primary-foreground/80 max-w-xl">
-              Your dashboard shows 3 active projects with 2 pending approvals.
-              Let's make progress today!
+              Venturemond builds and scales the next generation of ventures and software products
+              Combining product strategy, design, and engineering to turn bold ideas into scalable realities.
             </p>
           </div>
 
