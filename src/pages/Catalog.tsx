@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +11,8 @@ const services = [
         id: "svc_1",
         title: "Enterprise Platform",
         description: "Full access to our enterprise management suite with dedicated resources.",
-        price: "$2,499",
+        priceUSD: 2499,
+        priceINR: 209999,
         period: "/month",
         features: ["Unlimited Users", "Priority Support", "Custom Integrations", "SLA Guarantee"],
         popular: true
@@ -19,7 +21,8 @@ const services = [
         id: "svc_2",
         title: "Professional Tier",
         description: "Perfect for growing teams needing robust project tracking tools.",
-        price: "$999",
+        priceUSD: 999,
+        priceINR: 84999,
         period: "/month",
         features: ["Up to 10 Users", "Email Support", "API Access", "Daily Backups"],
         popular: false
@@ -28,7 +31,8 @@ const services = [
         id: "svc_3",
         title: "Starter Package",
         description: "Essential tools for small businesses just getting started.",
-        price: "$499",
+        priceUSD: 499,
+        priceINR: 41999,
         period: "/month",
         features: ["Up to 3 Users", "Community Support", "Basic Analytics", "Weekly Reports"],
         popular: false
@@ -36,6 +40,16 @@ const services = [
 ];
 
 export default function Catalog() {
+    const [currency, setCurrency] = useState<"INR" | "USD">("USD");
+
+    const formatPrice = (amount: number) => {
+        return new Intl.NumberFormat(currency === "USD" ? "en-US" : "en-IN", {
+            style: "currency",
+            currency: currency,
+            maximumFractionDigits: 0
+        }).format(amount);
+    };
+
     return (
         <div className="min-h-screen bg-background">
             <header className="px-6 h-16 flex items-center border-b border-border/40 glass sticky top-0 z-50">
@@ -53,6 +67,25 @@ export default function Catalog() {
                         Choose the perfect plan to accelerate your business growth.
                         All plans include access to our client dashboard.
                     </p>
+
+                    <div className="flex justify-center mt-6 gap-2">
+                        <Button
+                            variant={currency === "INR" ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setCurrency("INR")}
+                            className="w-24"
+                        >
+                            INR (₹)
+                        </Button>
+                        <Button
+                            variant={currency === "USD" ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setCurrency("USD")}
+                            className="w-24"
+                        >
+                            USD ($)
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
@@ -65,7 +98,9 @@ export default function Catalog() {
                             </CardHeader>
                             <CardContent className="flex-1">
                                 <div className="mb-6">
-                                    <span className="text-4xl font-bold">{service.price}</span>
+                                    <span className="text-4xl font-bold">
+                                        {formatPrice(currency === "USD" ? service.priceUSD : service.priceINR)}
+                                    </span>
                                     <span className="text-muted-foreground">{service.period}</span>
                                 </div>
                                 <ul className="space-y-3">
