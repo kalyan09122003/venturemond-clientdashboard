@@ -84,10 +84,7 @@ export default function Projects() {
             Manage your active projects and collaborations
           </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4" />
-          New Project
-        </Button>
+
       </div>
 
       {/* Filters & View Toggle */}

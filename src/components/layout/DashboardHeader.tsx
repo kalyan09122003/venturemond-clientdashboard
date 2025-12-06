@@ -128,7 +128,10 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
                 Billing
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={() => navigate("/login")}
+              >
                 Sign out
               </DropdownMenuItem>
             </DropdownMenuContent>
