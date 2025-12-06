@@ -47,29 +47,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 
         {/* Right side */}
         <div className="flex items-center gap-2 md:gap-4">
-          {/* Quick Actions */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="accent" size="sm" className="hidden sm:flex">
-                <Plus className="h-4 w-4" />
-                <span className="hidden md:inline">Quick Action</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate("/projects")}>
-                New Project
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/services")}>
-                Buy Service
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/team")}>
-                Invite Team
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/support")}>
-                Raise Ticket
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+
 
           {/* Notifications */}
           <DropdownMenu>

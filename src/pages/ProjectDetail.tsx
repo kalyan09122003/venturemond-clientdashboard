@@ -12,6 +12,7 @@ import {
   MoreHorizontal,
   Plus,
   GripVertical,
+  Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +20,11 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { ApproveDeliverableDialog } from "@/components/projects/ApproveDeliverableDialog";
+import { RejectDeliverableDialog } from "@/components/projects/RejectDeliverableDialog";
+import { useToast } from "@/hooks/use-toast";
 
-const project = {
+const initialProject = {
   id: "proj-1",
   name: "Project Alpha",
   description:
@@ -57,7 +61,7 @@ const tasks = {
   ],
 };
 
-const deliverables = [
+const initialDeliverables = [
   {
     id: 1,
     name: "UI/UX Design Files",
@@ -98,6 +102,19 @@ const meetings = [
 export default function ProjectDetail() {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState("overview");
+  const { toast } = useToast();
+
+  const [project] = useState(initialProject);
+  const [deliverables, setDeliverables] = useState(initialDeliverables);
+  const [timelineEvents, setTimelineEvents] = useState([
+    { id: 1, title: "Project Created", date: "Jan 1, 2024", description: "Project initiated by client" },
+    { id: 2, title: "Design Phase Completed", date: "Jan 31, 2024", description: "All design milestones approved" },
+  ]);
+
+  // Dialog States
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [selectedDeliverable, setSelectedDeliverable] = useState<typeof initialDeliverables[0] | null>(null);
 
   const priorityColors = {
     high: "bg-destructive/10 text-destructive",
@@ -105,8 +122,91 @@ export default function ProjectDetail() {
     low: "bg-muted text-muted-foreground",
   };
 
+  const handleApproveClick = (deliverable: typeof initialDeliverables[0]) => {
+    setSelectedDeliverable(deliverable);
+    setApproveDialogOpen(true);
+  };
+
+  const handleRejectClick = (deliverable: typeof initialDeliverables[0]) => {
+    setSelectedDeliverable(deliverable);
+    setRejectDialogOpen(true);
+  };
+
+  const confirmApprove = (notes: string) => {
+    if (!selectedDeliverable) return;
+
+    // Update Deliverable Status
+    setDeliverables(prev => prev.map(d =>
+      d.id === selectedDeliverable.id ? { ...d, status: "approved" } : d
+    ));
+
+    // Show Toast
+    toast({
+      title: "Deliverable Approved",
+      description: `Successfully approved ${selectedDeliverable.name}.`,
+      variant: "default",
+      className: "bg-success text-white border-none"
+    });
+
+    // Add Timeline Event
+    const newEvent = {
+      id: Date.now(),
+      title: "Deliverable Approved",
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      description: `Client approved ${selectedDeliverable.name}${notes ? `: ${notes}` : ''}`
+    };
+    setTimelineEvents(prev => [newEvent, ...prev]);
+
+    setApproveDialogOpen(false);
+  };
+
+  const confirmReject = (reason: string, file: File | null) => {
+    if (!selectedDeliverable) return;
+
+    // Update Deliverable Status
+    setDeliverables(prev => prev.map(d =>
+      d.id === selectedDeliverable.id ? { ...d, status: "rejected" } : d
+    ));
+
+    // Show Toast
+    toast({
+      title: "Deliverable Rejected",
+      description: `Feedback sent for ${selectedDeliverable.name}.`,
+      variant: "destructive"
+    });
+
+    // Add Timeline Event
+    const newEvent = {
+      id: Date.now(),
+      title: "Deliverable Rejected",
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      description: `Client rejected ${selectedDeliverable.name}. Reason: ${reason}`
+    };
+    setTimelineEvents(prev => [newEvent, ...prev]);
+
+    setRejectDialogOpen(false);
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Dialogs */}
+      {selectedDeliverable && (
+        <>
+          <ApproveDeliverableDialog
+            open={approveDialogOpen}
+            onOpenChange={setApproveDialogOpen}
+            onConfirm={confirmApprove}
+            deliverableName={selectedDeliverable.name}
+          />
+          <RejectDeliverableDialog
+            open={rejectDialogOpen}
+            onOpenChange={setRejectDialogOpen}
+            onConfirm={confirmReject}
+            deliverableName={selectedDeliverable.name}
+          />
+        </>
+      )}
+
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -215,24 +315,45 @@ export default function ProjectDetail() {
             </div>
 
             {/* Next Meeting */}
-            <div className="dashboard-card">
-              <h3 className="section-title mb-4">Upcoming Meeting</h3>
-              {meetings[0] && (
-                <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-info/10 text-info">
-                      <Video className="h-5 w-5" />
+            <div className="space-y-6">
+              <div className="dashboard-card">
+                <h3 className="section-title mb-4">Upcoming Meeting</h3>
+                {meetings[0] && (
+                  <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-info/10 text-info">
+                        <Video className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{meetings[0].title}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {meetings[0].date} at {meetings[0].time}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{meetings[0].title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {meetings[0].date} at {meetings[0].time}
-                      </p>
-                    </div>
+                    <Button size="sm">Join Call</Button>
                   </div>
-                  <Button size="sm">Join Call</Button>
+                )}
+              </div>
+
+              {/* Timeline Feed */}
+              <div className="dashboard-card">
+                <h3 className="section-title mb-4">Recent Activity</h3>
+                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                  {timelineEvents.map((event) => (
+                    <div key={event.id} className="flex gap-3 items-start">
+                      <div className="mt-1 p-1.5 rounded-full bg-secondary text-secondary-foreground">
+                        <Activity className="h-3 w-3" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{event.title}</p>
+                        <p className="text-xs text-muted-foreground mb-1">{event.date}</p>
+                        <p className="text-xs text-muted-foreground">{event.description}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </TabsContent>
@@ -241,10 +362,7 @@ export default function ProjectDetail() {
           <div className="dashboard-card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="section-title">Milestones</h3>
-              <Button size="sm" variant="outline">
-                <Plus className="h-4 w-4 mr-1" />
-                Add Milestone
-              </Button>
+
             </div>
             <div className="space-y-3">
               {milestones.map((milestone) => (
@@ -316,10 +434,7 @@ export default function ProjectDetail() {
                       </div>
                     </div>
                   ))}
-                  <Button variant="ghost" className="w-full justify-start text-muted-foreground">
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add task
-                  </Button>
+
                 </div>
               </div>
             ))}
@@ -330,10 +445,7 @@ export default function ProjectDetail() {
           <div className="dashboard-card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="section-title">Deliverables</h3>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-1" />
-                Upload
-              </Button>
+
             </div>
             <div className="space-y-3">
               {deliverables.map((deliverable) => (
@@ -357,17 +469,19 @@ export default function ProjectDetail() {
                       className={cn(
                         deliverable.status === "approved"
                           ? "bg-success/10 text-success"
-                          : "bg-warning/10 text-warning"
+                          : deliverable.status === "rejected"
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-warning/10 text-warning"
                       )}
                     >
                       {deliverable.status}
                     </Badge>
                     {deliverable.status === "pending" && (
                       <>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" onClick={() => handleRejectClick(deliverable)}>
                           Reject
                         </Button>
-                        <Button size="sm" variant="success">
+                        <Button size="sm" variant="success" onClick={() => handleApproveClick(deliverable)}>
                           Approve
                         </Button>
                       </>
@@ -466,3 +580,4 @@ export default function ProjectDetail() {
     </div>
   );
 }
+
