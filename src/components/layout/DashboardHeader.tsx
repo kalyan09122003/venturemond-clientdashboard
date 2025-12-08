@@ -98,7 +98,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
               <DropdownMenuItem onClick={() => navigate("/account")}>
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/settings")}>
+              <DropdownMenuItem onClick={() => navigate("/account")}>
                 Settings
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/billing")}>
