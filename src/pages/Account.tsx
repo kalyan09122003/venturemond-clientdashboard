@@ -50,8 +50,8 @@ interface CompanyInfo {
   taxId: string;
   address: string;
   country: string;
-  adminContact: string;
-  adminPhone: string;
+  Contact: string;
+  Phone: string;
 }
 
 const SECTIONS = [
@@ -74,8 +74,8 @@ export default function Account() {
     taxId: "GSTIN-12AB34C",
     address: "123 Business Park, Tech City",
     country: "India",
-    adminContact: "admin@acme.com",
-    adminPhone: "+91 98765 43210",
+    Contact: "hello@acme.com",
+    Phone: "+91 98765 43210",
   });
   const [editCompanyOpen, setEditCompanyOpen] = useState(false);
   const [tempCompanyInfo, setTempCompanyInfo] = useState<CompanyInfo>(companyInfo);
@@ -271,10 +271,10 @@ export default function Account() {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase tracking-wider">Admin Contact</Label>
+                  <Label className="text-xs text-muted-foreground uppercase tracking-wider">Contact</Label>
                   <div className="flex flex-col">
-                    <span className="font-medium">{companyInfo.adminContact}</span>
-                    <span className="text-sm text-muted-foreground">{companyInfo.adminPhone}</span>
+                    <span className="font-medium">{companyInfo.Contact}</span>
+                    <span className="text-sm text-muted-foreground">{companyInfo.Phone}</span>
                   </div>
                 </div>
               </div>
