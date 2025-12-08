@@ -89,7 +89,6 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
                 </Avatar>
                 <div className="hidden md:flex flex-col items-start">
                   <span className="text-sm font-medium">John Doe</span>
-                  <span className="text-xs text-muted-foreground">Admin</span>
                 </div>
               </Button>
             </DropdownMenuTrigger>
